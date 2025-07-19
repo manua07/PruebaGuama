@@ -1,5 +1,7 @@
 package com.transactions.guama.use_cases;
 
+import java.text.ParseException;
+
 import org.springframework.stereotype.Service;
 
 import com.transactions.guama.domain.Transaction;
@@ -14,7 +16,7 @@ public class GetTransactionsUseCase {
         this.transacionsRepository = transacionsRepository;
     }
 
-    public Transaction getTransaction(String id) {
+    public Transaction getTransaction(String id) throws ParseException {
         return transacionsRepository.findTransaction(id);
     }
 

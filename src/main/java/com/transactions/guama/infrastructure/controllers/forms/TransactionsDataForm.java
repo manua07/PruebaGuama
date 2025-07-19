@@ -1,13 +1,15 @@
 package com.transactions.guama.infrastructure.controllers.forms;
 
+import java.sql.Date;
+
 import com.transactions.guama.domain.Transaction;
 
 public class TransactionsDataForm {
 
     private String id;
     private String nombre;
-    private String fecha;
-    private Number valor;
+    private Date fecha;
+    private double valor;
     private String estado;
 
     public Transaction toTransactions() {
@@ -33,22 +35,22 @@ public class TransactionsDataForm {
     }
 
 
-    public String getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
 
-    public void setFecha(String fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 
 
-    public Number getValor() {
+    public double getValor() {
         return valor;
     }
 
 
-    public void setValor(Number valor) {
+    public void setValor(double valor) {
         this.valor = valor;
     }
 

@@ -1,5 +1,6 @@
 package com.transactions.guama.infrastructure.controllers;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.http.MediaType;
@@ -49,27 +50,28 @@ public class TransactionsController {
     }
 
     @GetMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public List<Transaction> GetAllTransactions() {
+    public List<Transaction> GetAllTransactions() throws ParseException {
         return getAllTransactionsUseCase.getAll();
     }
 
     @GetMapping(value = "/api/transaction", params = "id", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Transaction GetTransactions(@RequestParam String id) {
+    public Transaction GetTransactions(@RequestParam String id) throws ParseException {
         Transaction getTransaction = getTransactionsUseCase.getTransaction(id);
         return getTransaction;
     }
 
     @DeleteMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> deleteTransaction(@RequestParam String id) {
+    public ResponseEntity<String> deleteTransaction(@RequestParam String id) throws ParseException {
         Transaction deleted = deleteTransactionsUseCase.delete(id);
         return null;
     }
 
     @PutMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Transaction editTransaction(@RequestBody TransactionsDataForm createTransactionsDataForm) {
+    public Transaction editTransaction(@RequestBody TransactionsDataForm createTransactionsDataForm) throws ParseException {
         return editTransactionsUseCase.editTransaction(createTransactionsDataForm.toTransactions());
     }
 
+    
 }
 
 

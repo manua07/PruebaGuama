@@ -1,6 +1,11 @@
 package com.transactions.guama.persistence;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,19 +36,21 @@ public class DynamoDBConnection {
     }
 
     public void saveTransaction(Transaction transaction){
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaFormateada = formato.format(transaction.getFecha());
         PutItemResponse response = dynamoDbClient.putItem(PutItemRequest.builder().item(Map.of(
             "id", AttributeValue.builder().s(transaction.getId()).build(),
             "Nombre", AttributeValue.builder().s(transaction.getNombre()).build(),
-            "Fecha", AttributeValue.builder().s(transaction.getFecha()).build(),
+            "Fecha", AttributeValue.builder().s(String.valueOf(fechaFormateada)).build(),
             "Valor", AttributeValue.builder().n(String.valueOf(transaction.getValor())).build(),
-            "Estado", AttributeValue.builder().s(transaction.getEstado()).build()
+            "Estado", AttributeValue.builder().s(String.valueOf(transaction.getEstado())).build()
             
             )).returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
                 .tableName("TransactionsGuama")
                 .build());
     }
 
-    public List<Transaction> getAllTransactions(){
+    public List<Transaction> getAllTransactions() throws ParseException{
         List<Transaction> transactions = new ArrayList<>();
 
         ScanRequest scanRequest = ScanRequest.builder()
@@ -55,17 +62,20 @@ public class DynamoDBConnection {
         for (Map<String, AttributeValue> item : scanResponse.items()) {
             Transaction transaction = new Transaction();
             transaction.setId(item.get("id").s());
-            transaction.setNombre(item.get("Nombre").s());
-            transaction.setFecha(item.get("Fecha").s());
+            transaction.setNombre(item.get("Nombre").s()); 
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+            Date utilDate = (Date) formato.parse(item.get("Fecha").s());
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            transaction.setFecha(sqlDate);
             transaction.setValor(Double.valueOf(item.get("Valor").n()));
-            transaction.setEstado(item.get("Estado").s());
+            transaction.setEstado(Transaction.Estado.valueOf(item.get("Estado").s()));
 
             transactions.add(transaction);
         }
         return transactions;
     }
 
-    public Transaction getTransaction(String id){
+    public Transaction getTransaction(String id) throws ParseException{
         Map<String, AttributeValue> key = Map.of(
         "id", AttributeValue.builder().s(id).build()
 
@@ -86,9 +96,12 @@ public class DynamoDBConnection {
             Transaction transaction = new Transaction();
             transaction.setId(item.get("id").s());
             transaction.setNombre(item.get("Nombre").s());
-            transaction.setFecha(item.get("Fecha").s());
-            transaction.setValor(Double.valueOf(item.get("Valor").n()));
-            transaction.setEstado(item.get("Estado").s());
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+            Date utilDate = (Date) formato.parse(item.get("Fecha").s());
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            transaction.setFecha(sqlDate);
+            transaction.setValor(Double.parseDouble(item.get("Valor").n()));
+            transaction.setEstado(Transaction.Estado.valueOf(item.get("Estado").s()));
         
         return transaction;
     }
@@ -111,5 +124,43 @@ public class DynamoDBConnection {
         dynamoDbClient.close();
     }
 
-    
+    public List<Transaction> getTransactionsToPay() throws ParseException {
+    List<Transaction> transactions = new ArrayList<>();
+
+    // Filtro por estado
+    Map<String, AttributeValue> expressionValues = new HashMap<>();
+    expressionValues.put(":estado", AttributeValue.builder().s(String.valueOf(Transaction.Estado.No_Pagado)).build());
+
+    ScanRequest scanRequest = ScanRequest.builder()
+        .tableName("TransactionsGuama")
+        .filterExpression("Estado = :estado")
+        .expressionAttributeValues(expressionValues)
+        .build();
+
+    ScanResponse scanResponse = dynamoDbClient.scan(scanRequest);
+
+    SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+
+    for (Map<String, AttributeValue> item : scanResponse.items()) {
+        Transaction transaction = new Transaction();
+        transaction.setId(item.get("id").s());
+        transaction.setNombre(item.get("Nombre").s());
+        
+        Date utilDate = (Date) formato.parse(item.get("Fecha").s());
+        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+        transaction.setFecha(sqlDate);
+        
+        transaction.setValor(Double.parseDouble(item.get("Valor").n()));
+        transaction.setEstado(Transaction.Estado.valueOf(item.get("Estado").s()));
+
+        transactions.add(transaction);
+    }
+
+    // Ordenar por fecha ascendente (más antigua primero)
+    transactions.sort(Comparator.comparing(Transaction::getFecha));
+
+    return transactions;
+}
+
+
 }

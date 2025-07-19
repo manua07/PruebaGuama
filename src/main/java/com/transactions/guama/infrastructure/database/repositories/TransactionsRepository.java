@@ -1,5 +1,6 @@
 package com.transactions.guama.infrastructure.database.repositories;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public class TransactionsRepository implements TransactionsRepositoryInterface {
     }
 
     @Override
-    public List<Transaction> findAll() {
+    public List<Transaction> findAll() throws ParseException {
         dynamoConnection = new DynamoDBConnection();
         dynamoConnection.initDBDynamo();
         List<Transaction> transactions = dynamoConnection.getAllTransactions();
@@ -41,11 +42,20 @@ public class TransactionsRepository implements TransactionsRepositoryInterface {
     }
 
     @Override
-    public Transaction findTransaction(String id) {
+    public Transaction findTransaction(String id) throws ParseException {
         dynamoConnection = new DynamoDBConnection();
         dynamoConnection.initDBDynamo();
         Transaction transaction= dynamoConnection.getTransaction(id);
         dynamoConnection.closeDynamoConnection();
         return transaction;
+    }
+
+    @Override
+    public List<Transaction> getTransactionsToPay() throws ParseException {
+        dynamoConnection = new DynamoDBConnection();
+        dynamoConnection.initDBDynamo();
+        List<Transaction> transactions = dynamoConnection.getTransactionsToPay();
+        dynamoConnection.closeDynamoConnection();
+        return transactions;
     }
 }

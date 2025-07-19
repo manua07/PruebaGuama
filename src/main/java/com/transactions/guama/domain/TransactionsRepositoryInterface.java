@@ -1,5 +1,6 @@
 package com.transactions.guama.domain;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface TransactionsRepositoryInterface {
@@ -8,8 +9,11 @@ public interface TransactionsRepositoryInterface {
 
     Transaction delete(String id);
     
-    List<Transaction> findAll();
+    List<Transaction> findAll() throws ParseException;
 
-    Transaction findTransaction(String id);
+    Transaction findTransaction(String id) throws ParseException;
+
+    List<Transaction> getTransactionsToPay() throws ParseException;
+
 
 }

@@ -1,5 +1,7 @@
 package com.transactions.guama.use_cases;
 
+import java.text.ParseException;
+
 import org.springframework.stereotype.Service;
 
 import com.transactions.guama.domain.Transaction;
@@ -14,12 +16,12 @@ private final TransactionsRepositoryInterface transacionsRepository;
         this.transacionsRepository = transacionsRepository;
     }
 
-    public Transaction editTransaction(Transaction transaction) {
+    public Transaction editTransaction(Transaction transaction) throws ParseException {
         Transaction savedtransaction = null;
         Transaction transactionget = transacionsRepository.findTransaction(transaction.getId());
 
         if (transactionget != null){
-            if ("Pagado".equalsIgnoreCase(transactionget.getEstado())) {
+            if (Transaction.Estado.Pagado == transactionget.getEstado()){
                 throw new IllegalStateException("No se puede editar una transacción que ya está pagada.");
             }
             savedtransaction = transacionsRepository.save(transaction);
