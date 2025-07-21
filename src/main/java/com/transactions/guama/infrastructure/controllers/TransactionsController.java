@@ -4,12 +4,13 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,10 @@ import com.transactions.guama.use_cases.GetAllTransactionsUseCase;
 import com.transactions.guama.use_cases.GetTransactionsUseCase;
 
 
+@CrossOrigin(origins = "http://localhost:3000", 
+methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 @RestController
+
 public class TransactionsController {
 
     private final CreateTransactionUseCase createTransactionUseCase;
@@ -54,16 +58,16 @@ public class TransactionsController {
         return getAllTransactionsUseCase.getAll();
     }
 
-    @GetMapping(value = "/api/transaction", params = "id", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/api/transactions", params = "id", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Transaction GetTransactions(@RequestParam String id) throws ParseException {
         Transaction getTransaction = getTransactionsUseCase.getTransaction(id);
         return getTransaction;
     }
 
     @DeleteMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> deleteTransaction(@RequestParam String id) throws ParseException {
+    public Transaction deleteTransaction(@RequestParam String id) throws ParseException {
         Transaction deleted = deleteTransactionsUseCase.delete(id);
-        return null;
+        return deleted;
     }
 
     @PutMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

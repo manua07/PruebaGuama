@@ -23,6 +23,7 @@ private final TransactionsRepositoryInterface transacionsRepository;
                 throw new IllegalStateException("No se puede eliminar una transacción que ya está pagada.");
             }
         }
+        transacionsRepository.delete(id);
         return transactiondelete;
     }
 }
