@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { getAllTransactions, deleteTransaction } from '../services/transactionService';
+import { getAllTransactions, deleteTransaction, payTransactions} from '../services/transactionService';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
-    const navigate = useNavigate();
     const [filtered, setFiltered] = useState([]);
-    const [filters, setFilters] = useState({
-        nombre: '',
-        fecha: '',
-        estado: '',
-    });
+    const [filters, setFilters] = useState({ nombre: '', fecha: '', estado: '' });
+    const [modalOpen, setModalOpen] = useState(false);
+    const [valorPago, setValorPago] = useState('');
+    const [valorTotal, setValorTotal] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
-        const data = await getAllTransactions();
-        setTransactions(data);
+            const data = await getAllTransactions();
+            setTransactions(data);
         };
         fetchData();
     }, []);
@@ -41,39 +40,74 @@ const TransactionList = () => {
         setFiltered(filteredData);
     }, [filters, transactions]);
 
-    const handleAgregar = () => {
-        navigate('/agregar');
-    };
+    const handleAgregar = () => navigate('/agregar');
 
     const handleChange = (e) => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
 
     const handleDelete = async (id, estado) => {
-    if (estado === 'Pagado') {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Acción no permitida',
-            text: 'No se puede eliminar una transacción que ya está pagada.',
-            confirmButtonColor: '#0077cc',
-        });
-        return;
-    }
+        if (estado === 'Pagado') {
+            Swal.fire({
+                icon: 'warning',
+                text: 'No se puede eliminar una transacción que ya está pagada.',
+                confirmButtonColor: '#0077cc',
+            });
+            return;
+        }
 
-    const confirmDelete = Swal.fire({
-            icon: 'success',
-            text: 'Registro eliminado correctamente',
-            confirmButtonColor: '#0077cc',
-        });
-    if (confirmDelete) {
         await deleteTransaction(id);
         setTransactions(transactions.filter(tx => tx.id !== id));
-    }
+
+        Swal.fire({
+            icon: 'success',
+            text: 'Transación eliminada correctamente',
+            confirmButtonColor: '#0077cc',
+        });
+    };
+
+    const handleOpenModal = () => {
+        const total = transactions
+            .filter(tx => tx.estado === 'No_Pagado')
+            .reduce((sum, tx) => sum + parseFloat(tx.valor), 0);
+        setValorTotal(total);
+        setValorPago('');
+        setModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+    };
+
+    const handleConfirmPago = async () => {
+        const valor = parseFloat(valorPago);
+        if (isNaN(valor) || valor <= 0) {
+            Swal.fire('Error', 'Ingresa un valor válido', 'error');
+            return;
+        }
+
+        if (valor < valorTotal) {
+            Swal.fire('Error', 'El valor ingresado no cubre el total a pagar', 'error');
+            return;
+        }
+
+        await payTransactions(valor);
+
+            Swal.fire({
+                icon: 'success',
+                text: `Transacciones pagadas correctamente`,
+                confirmButtonColor: '#0077cc',
+            });
+
+            setModalOpen(false);
+
+            const updatedTransactions = await getAllTransactions();
+            setTransactions(updatedTransactions);
     };
 
     return (
         <div style={styles.container}>
-        <div style={styles.filtersContainer}>
+            <div style={styles.filtersContainer}>
                 <input
                     type="text"
                     placeholder="Filtrar por nombre"
@@ -100,65 +134,91 @@ const TransactionList = () => {
                     <option value="No_Pagado">No pagado</option>
                 </select>
             </div>
-                <button style={styles.addButton} onClick={handleAgregar}>Agregar transaccion</button>
-                <button style={styles.payButton}>Pagar transacciones</button>
-        <table style={styles.table}>
-            <thead>
-            <tr>
-                <th style={{ ...styles.th, width: '300px', textAlign: 'center' }}>ID</th>
-                <th style={styles.th}>Nombre</th>
-                <th style={styles.th}>Fecha</th>
-                <th style={styles.th}>Valor</th>
-                <th style={styles.th}>Estado</th>
-                <th style={{ ...styles.th, width: '150px', textAlign: 'center' }}>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <table style={styles.table}></table>
-            {filtered.length > 0 ? (
-                filtered.map((tx, index) => (
-                    <tr key={index} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
-                        <td style={styles.td}>{tx.id}</td>
-                        <td style={styles.td}>{tx.nombre}</td>
-                        <td style={styles.td}>{tx.fecha}</td>
-                        <td style={styles.td}>${parseFloat(tx.valor).toLocaleString()}</td>
-                        <td style={styles.td}>{tx.estado}</td>
-                        <td style={{ ...styles.td, textAlign: 'center' }}>
-                            <div style={styles.actionButtons}>
-                                <button style={styles.editButton} onClick={() => navigate(`/edit/${tx.id}`)}>
-                                    Editar
-                                </button>
-                                <button style={styles.deleteButton} onClick={() => handleDelete(tx.id, tx.estado)}>
-                                    Eliminar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))
-                ) : (
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '20px' }}>
+                <button style={styles.addButton} onClick={handleAgregar}>Agregar transacción</button>
+                <button style={styles.payButton} onClick={handleOpenModal}>Pagar transacciones</button>
+            </div>
+
+            <table style={styles.table}>
+                <thead>
                     <tr>
-                        <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                            No se encontraron transacciones.
-                        </td>
+                        <th style={{ ...styles.th, width: '400px', textAlign: 'center' }}>ID</th>
+                        <th style={styles.th}>Nombre</th>
+                        <th style={styles.th}>Fecha</th>
+                        <th style={styles.th}>Valor</th>
+                        <th style={styles.th}>Estado</th>
+                        <th style={{ ...styles.th, width: '150px', textAlign: 'center' }}>Acciones</th>
                     </tr>
-                )}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {filtered.length > 0 ? (
+                        filtered.map((tx, index) => (
+                            <tr key={index} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
+                                <td style={styles.td}>{tx.id}</td>
+                                <td style={styles.td}>{tx.nombre}</td>
+                                <td style={styles.td}>{tx.fecha}</td>
+                                <td style={styles.td}>${parseFloat(tx.valor).toLocaleString()}</td>
+                                <td style={styles.td}>
+                                    <span
+                                        style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            backgroundColor: tx.estado === 'Pagado' ? '#28a745' : '#dc3545',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        {tx.estado === 'Pagado' ? 'Pagado' : 'No pagado'}
+                                    </span>
+                                </td>
+                                <td style={{ ...styles.td, textAlign: 'center' }}>
+                                    <div style={styles.actionButtons}>
+                                        <button style={styles.editButton} onClick={() => navigate(`/edit/${tx.id}`)}>Editar</button>
+                                        <button style={styles.deleteButton} onClick={() => handleDelete(tx.id, tx.estado)}>Eliminar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
+                                No se encontraron transacciones.
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+
+            {modalOpen && (
+                <div style={styles.modalOverlay}>
+                    <div style={styles.modal}>
+                        <h3>Valor total a pagar: <strong>${valorTotal.toLocaleString()}</strong></h3>
+                        <input
+                            type="number"
+                            placeholder="Ingrese el valor a pagar"
+                            value={valorPago}
+                            onChange={(e) => setValorPago(e.target.value)}
+                            style={styles.modalInput}
+                        />
+                        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                            <button onClick={handleCloseModal} style={styles.cancelButton}>Cancelar</button>
+                            <button onClick={handleConfirmPago} style={styles.confirmButton}>Confirmar pago</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
-    };
+};
 
-    const styles = {
+const styles = {
     container: {
         padding: '40px',
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#f7f9fb',
         minHeight: '100vh',
-    },
-    title: {
-        textAlign: 'center',
-        marginBottom: '30px',
-        color: '#333',
     },
     table: {
         width: '100%',
@@ -187,7 +247,6 @@ const TransactionList = () => {
         display: 'flex',
         gap: '20px',
     },
-
     editButton: {
         backgroundColor: '#0077cc',
         color: 'white',
@@ -196,7 +255,6 @@ const TransactionList = () => {
         borderRadius: '4px',
         cursor: 'pointer',
     },
-
     deleteButton: {
         backgroundColor: '#dc3545',
         color: 'white',
@@ -205,18 +263,13 @@ const TransactionList = () => {
         borderRadius: '4px',
         cursor: 'pointer',
     },
-
-    addButton: { 
-        marginRight: '10px',
+    addButton: {
         backgroundColor: '#0077cc',
         color: 'white',
         border: 'none',
         padding: '6px 12px',
         borderRadius: '4px',
         cursor: 'pointer',
-        justifyContent: 'flex-end',
-        marginBottom: '30px',
-        
     },
     payButton: {
         backgroundColor: '#28863bff',
@@ -225,7 +278,6 @@ const TransactionList = () => {
         padding: '6px 12px',
         borderRadius: '4px',
         cursor: 'pointer',
-        justifyContent: 'flex-end',
     },
     filterInput: {
         padding: '8px',
@@ -234,13 +286,45 @@ const TransactionList = () => {
         fontSize: '14px',
         minWidth: '180px',
     },
-    filtersContainer: {
+    modalOverlay: {
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
-        justifyContent: 'flex-end',
-        gap: '10px',
-        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-
-    };
+    modal: {
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '8px',
+        width: '400px',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+    },
+    modalInput: {
+        width: '100%',
+        padding: '10px',
+        marginTop: '10px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        fontSize: '16px',
+    },
+    cancelButton: {
+        backgroundColor: '#ccc',
+        color: '#000',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+    },
+    confirmButton: {
+        backgroundColor: '#0077cc',
+        color: 'white',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+    },
+};
 
 export default TransactionList;

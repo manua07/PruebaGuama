@@ -8,7 +8,6 @@ const EditTransaction = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     
-
     const [form, setForm] = useState({
         nombre: '',
         fecha: '',
@@ -22,15 +21,13 @@ const EditTransaction = () => {
             const data = await getTransactionById(id);
             if (data) {
                 if (data.estado === 'Pagado') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Acción no permitida',
-                            text: 'No se puede eliminar una transacción que ya está pagada.',
-                            confirmButtonColor: '#0077cc',
-                            }).then(() => {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: 'No se puede editar una transacción que ya está pagada.',
+                        confirmButtonColor: '#0077cc',
+                        }).then(() => {
                             navigate('/');
                         });
-                        return;
                     }
                 else {
                 setForm({
@@ -63,11 +60,18 @@ const EditTransaction = () => {
     e.preventDefault();
 
     try {
-        await updateTransaction(id, form);
+        const [year, month, day] = form.fecha.split('-');
+        const localDate = new Date(year, month - 1, day);
+
+        const updatedForm = {
+            ...form,
+            fecha: localDate.toISOString(),
+        };
+        await updateTransaction(id, updatedForm);
 
         await Swal.fire({
             icon: 'success',
-            text: 'Registro actualizado correctamente',
+            text: 'Transacción actualizada correctamente',
             confirmButtonColor: '#0077cc',
         });
 
@@ -80,7 +84,7 @@ const EditTransaction = () => {
 
     return (
         <div style={styles.container}>
-            <h2>Editar Transacción</h2>
+            <h2 style={styles.title}> Editar Transacción</h2>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <label style={styles.label}>Nombre:</label>
                 <input
@@ -132,6 +136,13 @@ const EditTransaction = () => {
 };
 
 const styles = {
+    title: {
+    textAlign: 'center',
+    fontSize: '28px',
+    fontWeight: 'bold',
+    color: '#0077cc',
+    marginBottom: '30px',
+    },
     container: {
         padding: '40px',
         fontFamily: 'Arial, sans-serif',
@@ -154,7 +165,7 @@ const styles = {
     button: {
         marginTop: '20px',
         padding: '10px',
-        backgroundColor: '#28a745',
+        backgroundColor: '#0077cc',
         color: 'white',
         border: 'none',
         borderRadius: '4px',

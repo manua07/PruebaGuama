@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createTransaction } from '../services/transactionService';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import Swal from 'sweetalert2';
 
 const CreateTransaction = () => {
     const [form, setForm] = useState({
@@ -18,20 +19,31 @@ const CreateTransaction = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
+    const [year, month, day] = form.fecha.split('-');
+    const localDate = new Date(year, month - 1, day);
 
-        const transactionWithId = {
-            ...form,
-            id: uuidv4(),
-        };
+    const transactionWithId = {
+        ...form,
+        id: uuidv4(),
+        fecha: localDate.toISOString(),
+    };
 
         await createTransaction(transactionWithId);
-        navigate('/');
+
+        Swal.fire({
+            text: 'Transacción creada correctamente.',
+            icon: 'success',
+            confirmButtonColor: '#0077cc',
+            confirmButtonText: 'OK',
+        }).then(() => {
+            navigate('/');
+        });
     };
 
     return (
         <div style={styles.container}>
-            <h2>Agregar Transacción</h2>
+            <h2 style={styles.title}>➕ Agregar Transacción</h2>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <label style={styles.label}>Nombre:</label>
                 <input
@@ -83,6 +95,13 @@ const CreateTransaction = () => {
 };
 
 const styles = {
+    title: {
+    textAlign: 'center',
+    fontSize: '28px',
+    fontWeight: 'bold',
+    color: '#0077cc',
+    marginBottom: '30px',
+    },
     container: {
         padding: '40px',
         fontFamily: 'Arial, sans-serif',
