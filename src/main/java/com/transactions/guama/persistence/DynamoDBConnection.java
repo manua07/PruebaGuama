@@ -156,7 +156,7 @@ public class DynamoDBConnection {
         transactions.add(transaction);
     }
 
-    // Ordenar por fecha ascendente (más antigua primero)
+    // Se ordena por fecha ascendente
     transactions.sort(Comparator.comparing(Transaction::getFecha));
 
     return transactions;

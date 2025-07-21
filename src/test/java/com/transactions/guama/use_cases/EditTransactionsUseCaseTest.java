@@ -1,4 +1,4 @@
-package com.transacciones.guama.use_cases;
+package com.transactions.guama.use_cases;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.transactions.guama.domain.Transaction;
 import com.transactions.guama.domain.TransactionsRepositoryInterface;
-import com.transactions.guama.use_cases.EditTransactionsUseCase;
 
 @ExtendWith(MockitoExtension.class)
 class EditTransactionsUseCaseTest {

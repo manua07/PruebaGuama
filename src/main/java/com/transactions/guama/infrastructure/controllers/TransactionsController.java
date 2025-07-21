@@ -22,6 +22,8 @@ import com.transactions.guama.use_cases.EditTransactionsUseCase;
 import com.transactions.guama.use_cases.GetAllTransactionsUseCase;
 import com.transactions.guama.use_cases.GetTransactionsUseCase;
 
+import jakarta.validation.Valid;
+
 
 @CrossOrigin(origins = "http://localhost:3000", 
 methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
@@ -49,7 +51,7 @@ public class TransactionsController {
     }
 
     @PostMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Transaction createTransaction(@RequestBody TransactionsDataForm createTransactionsDataForm) {
+    public Transaction createTransaction(@Valid @RequestBody TransactionsDataForm createTransactionsDataForm) {
         return createTransactionUseCase.create(createTransactionsDataForm.toTransactions());
     }
 
@@ -59,7 +61,7 @@ public class TransactionsController {
     }
 
     @GetMapping(value = "/api/transactions", params = "id", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Transaction GetTransactions(@RequestParam String id) throws ParseException {
+    public Transaction GetTransactions(@Valid @RequestParam String id) throws ParseException {
         Transaction getTransaction = getTransactionsUseCase.getTransaction(id);
         return getTransaction;
     }
@@ -71,7 +73,7 @@ public class TransactionsController {
     }
 
     @PutMapping(value = "/api/transactions", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Transaction editTransaction(@RequestBody TransactionsDataForm createTransactionsDataForm) throws ParseException {
+    public Transaction editTransaction(@Valid @RequestBody TransactionsDataForm createTransactionsDataForm) throws ParseException {
         return editTransactionsUseCase.editTransaction(createTransactionsDataForm.toTransactions());
     }
 

@@ -1,4 +1,4 @@
-package com.transacciones.guama.use_cases;
+package com.transactions.guama.use_cases;
 import java.sql.Date;
 import java.text.ParseException;
 
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.transactions.guama.domain.Transaction;
 import com.transactions.guama.domain.TransactionsRepositoryInterface;
-import com.transactions.guama.use_cases.DeleteTransactionsUseCase;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteTransactionsUseCaseTest {

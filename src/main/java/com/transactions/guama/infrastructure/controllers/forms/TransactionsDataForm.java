@@ -4,12 +4,24 @@ import java.sql.Date;
 
 import com.transactions.guama.domain.Transaction;
 
+import jakarta.validation.constraints.NotBlank;
+import software.amazon.awssdk.annotations.NotNull;
+
 public class TransactionsDataForm {
 
+    @NotBlank
     private String id;
+
+    @NotBlank
     private String nombre;
+
+    @NotNull
     private Date fecha;
-    private double valor;
+
+    @NotNull
+    private Double valor;
+
+    @NotBlank
     private String estado;
 
     public Transaction toTransactions() {
