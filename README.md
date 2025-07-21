@@ -25,12 +25,12 @@ Para correr el Backend se deben seguir los siguientes pasos:
 
 1. Ejecutar ¨mvn install¨ en consola.
 2. Encender Docker y ejecutar en consola ¨docker build -t guama-transactions .¨
-3. Ejecutar el siguiente commando en consola, con los datos enviados en el correo. ¨docker run -p 8080:8080 -e AWS_ACCESS_KEY_ID=tu-access-ke8 \
+3. Ejecutar el siguiente commando en consola, con los datos enviados en el correo. ¨docker run -p 8080:8080 -e AWS_ACCESS_KEY_ID=tu-access-key \
            -e AWS_SECRET_ACCESS_KEY=tu-secret-key \
            -e AWS_REGION=us-east-2 \guama-transactions¨
 4. Una vez ejecutado, el backend comenzaria a correr y se puede acceder a através de: *http://localhost:8080/api/transactions*
 
-Adjunto Collection para probar los servicios de la API: https://bold-rocket-312324.postman.co/workspace/ServiciosAndes~37bbb871-b2c5-4b8e-908d-292c7b858fd5/collection/8122221-c694fb37-3b73-45fa-b379-195202857be9?action=share&creator=8122221
+Adjunto Collection para probar los servicios de la API: https://drive.google.com/drive/folders/10ahaOOViDHa4ULawyr4zZA8Gn4OtDuyH?usp=drive_link
 
 ### Frontend
 Para correr el Frontend se deben seguir los siguientes pasos:
@@ -38,5 +38,8 @@ Para correr el Frontend se deben seguir los siguientes pasos:
 1. Desde la consola navegar con cd hasta la carpeta del front llamada ¨guama'frontend¨.
 2. Una vez en la carpeta ejecutar ¨npm install¨.
 3. Luego ejecutar ¨npm start¨.
-4. El frontend comenzara a correr y se abrira el navegador o se puede acceder desde: *://localhost:3000*
+4. El frontend comenzara a correr y se abrira el navegador o se puede acceder desde: *http://localhost:3000*
+
+### Pruebas 
+Para correr las pruebas unitarias o de integración se da clic derecho en cualquiera de las carpetas en las siguiente ruta: test/java/com/transacciones/guama y se selecciona ejecutar pruebas o ejecutar pruebas con cobertura. También se puede correr las pruebas de manera individual.
 
