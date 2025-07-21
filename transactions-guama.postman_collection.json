@@ -1,0 +1,185 @@
+{
+	"info": {
+		"_postman_id": "c694fb37-3b73-45fa-b379-195202857be9",
+		"name": "transactions-guama",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8122221",
+		"_collection_link": "https://bold-rocket-312324.postman.co/workspace/ServiciosAndes~37bbb871-b2c5-4b8e-908d-292c7b858fd5/collection/8122221-c694fb37-3b73-45fa-b379-195202857be9?action=share&source=collection_link&creator=8122221"
+	},
+	"item": [
+		{
+			"name": "Crear transactions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n       \"id\": \"1131314454ffgf4\",\n        \"nombre\": \"TransaccionPrueba\",\n        \"fecha\": \"2025-12-14\",\n        \"valor\": 60000,\n        \"estado\": \"No_Pagado\"\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener una transaction",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/transactions?id=b0797747-4d07-476f-bec5-3d6eb2382b63",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "b0797747-4d07-476f-bec5-3d6eb2382b63"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todas las transactions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar transaction",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/transactions?id=1131314454ffgf4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1131314454ffgf4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modificar transaction",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"a3416e05-b8ba-4f94-b42d-81a83c967c82\",\n    \"nombre\": \"PruebaTransaccionEdicion3\",\n    \"fecha\": \"2024-05-14\",\n    \"valor\": 700000.0,\n    \"estado\": \"No_Pagado\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pagar transactions",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/payments?valor=90000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payments"
+					],
+					"query": [
+						{
+							"key": "valor",
+							"value": "90000"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
