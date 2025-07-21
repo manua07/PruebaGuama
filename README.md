@@ -30,7 +30,7 @@ Para correr el Backend se deben seguir los siguientes pasos:
            -e AWS_REGION=us-east-2 \guama-transactions¨
 4. Una vez ejecutado, el backend comenzaria a correr y se puede acceder a através de: *http://localhost:8080/api/transactions*
 
-Adjunto Collection para probar los servicios de la API:
+Adjunto Collection para probar los servicios de la API: https://bold-rocket-312324.postman.co/workspace/ServiciosAndes~37bbb871-b2c5-4b8e-908d-292c7b858fd5/collection/8122221-c694fb37-3b73-45fa-b379-195202857be9?action=share&creator=8122221
 
 ### Frontend
 Para correr el Frontend se deben seguir los siguientes pasos:
